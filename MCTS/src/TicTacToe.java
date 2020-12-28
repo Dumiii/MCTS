@@ -126,7 +126,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 * @param x int x coordinate
 	 * @param y int y coordinate
 	 * @return char in the x,y on the board
-	 * @throws IllegalArgumentException if x or y aren't in bounds aka [0, dim)
+	 * @throws IllegalArgumentException if x or y aren't in bounds aka [0, dim]
 	 */
 	public char get(int x, int y) throws IllegalArgumentException {
 		if(!inBounds(x) || !inBounds(y))

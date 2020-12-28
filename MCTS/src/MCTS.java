@@ -13,11 +13,12 @@ class MCTS {
         private int wins;
         private int visits;
         private double ratio;
-		private double g;
 		private char player;
-		public State(Ilayout l, State n, char player){//?????????????????
+		
+		public State(Ilayout l, State n, char player) {//?????????????????
 			layout = l;
 			father = n;
+			this.player = player;
 			if(((TicTacToe) layout).winCheck(player)){
 				this.wins = 1;
 			}
