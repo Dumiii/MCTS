@@ -1,42 +1,25 @@
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Stack;
 
 class MCTS {
 	static class State{
 		private Ilayout layout;
-        private State father;
-        private int wins;
-        private int visits;
-        private double ratio;
+		private State father;
 		private char player;
-		
-		public State(Ilayout l, State n, char player) {//?????????????????
-			layout = l;
-			father = n;
+		private int visits;
+		private int wins;
+
+		public State(Ilayout l, State n, char player) {
+			this.layout = l;
+			this.father = n;
 			this.player = player;
 			if(((TicTacToe) layout).winCheck(player)){
 				this.wins = 1;
 			}
 			if(father != null){
-				this.visits=father.visits + l.getVisits();
-				this.backPropagation();
-			}
-			ratio = this.wins/this.visits;
-		}
-
-		public void backPropagation(){//?????????????????
-			if(father!=null){
-				if(layout.gameOver()){
-					father.wins++;
-				}
-				father.visits++;
-				father.ratio = father.wins/father.ratio;
-				father.backPropagation();
+				this.visits = father.visits + l.getVisits();
 			}
 		}
 
@@ -44,109 +27,117 @@ class MCTS {
 			return layout.toString();
 		}
 
-		// public double getG(){
-		// 	return g;
-		// }
+		public char getPlayer() {
+			return player;
+		}
 
-		// public int compareToGoal(Ilayout obj){
-		// 	int result = 0;
-		// 	for(Stack<Character> curr : ((Table) this.layout).getList()) {
-		// 		for(Stack<Character> goal :((Table) obj).getList()){
-		// 			if(!curr.isEmpty() && !goal.isEmpty()){
-		// 				result += countWhile(curr, goal);
-		// 			}
-		// 		}
-		// 	}
-		// 	return ((Table) this.layout).getDim() - result + ((int)this.getG());
-		// }
+		public int getVisits() {
+			return visits;
+		}
 
-		// public int findC(Character c, Stack<Character> s2){
-		// 	int result = 0;
-		// 	while(result<s2.size() && !c.equals(s2.get(result))){
-		// 		result++;
-		// 	}
-		// 	return result;
-		// }
-
-		// public int countWhileReverse(int start, Stack<Character> s1, Stack<Character> s2){
-		// 	int result = 0;
-		// 	int index = start;
-		// 	while(result<s1.size() && index>=0 && index<s2.size() && s1.get(result).equals(s2.get(index))){
-		// 		result++;
-		// 		index--;
-		// 	}
-		// 	return result;
-		// }
-
-		// public int countWhile(Stack<Character> s1, Stack<Character> s2){
-		// 	int result = 0;
-		// 	while(result<s1.size() && result<s2.size() && s1.get(result).equals(s2.get(result))){
-		// 		result++;
-		// 	}
-		// 	return result;
-		// }
-
-		// public int compareToOther(State other, Ilayout goal){
-		// 	int result = this.compareToGoal(goal) - other.compareToGoal(goal);
-		// 	return result != 0 ? result : (int) (this.getG()-other.getG());
-		// }
-		// @Override
-		// public boolean equals(Object other){
-		// 	if (other == this) return true;
-		// 	if (other == null) return false;
-		// 	State that = (State) other;
-		// 	if(getClass() != that.getClass()) return false;
-		// 	return ((Table) this.layout).equals((Table) that.layout) && this.getG() == that.getG();
-		// }
+		public int getWins() {
+			return wins;
+		}
 	}
-	// protected Queue<State> abertos;
-	// private List<State> fechados;
-	// private State actual;
-	// private Ilayout objective;
 
-	// final private List<State> sucessores(State n){
-	// 	List<State> sucs = new ArrayList<>();
-	// 	List<Ilayout> children = n.layout.children();
-	// 	for(Ilayout e: children){
-	// 		if(n.father == null || !e.equals(n.father.layout)){
-	// 			State nn = new State(e, n);
-	// 			sucs.add(nn);
-	// 		}
-	// 	}
-	// 	return sucs;
-	// }
+	private int level;
+	private char opponent;
+	
+	public MCTS() {
+		this.level = 3;
+	}
 
-	// final public Iterator<State> solve(Ilayout s, Ilayout goal){
-	// 	objective = goal;
-	// 	abertos = new PriorityQueue<>(10, (s1, s2) -> (int) Math.signum(s1.compareToGoal(objective) - s2.compareToGoal(objective)));
-	// 	fechados = new ArrayList<>();
-	// 	abertos.add(new State(s, null));
-	// 	List<State> sucs;
-	// 	if(s.isGoal(objective)) return abertos.iterator();
-	// 	while(!s.equals(objective)){
-	// 		if(abertos.isEmpty())
-	// 			return null;
-	// 		actual = abertos.poll();
-	// 		System.out.println(actual.getG() + " " + actual.compareToGoal(objective) + "\n-----------------");
-	// 		System.out.println(actual);
-	// 		if(actual.layout.isGoal(objective)){
-	// 			ArrayList<State> result = new ArrayList<>();
-	// 			State current = actual;
-	// 			while(current != null){
-	// 				result.add(current);
-	// 				current = current.father;
-	// 			}
-	// 			Collections.reverse(result);
-	// 			return result.iterator();
-	// 		}
-	// 		else{
-	// 			sucs = sucessores(actual);
-	// 			fechados.add(actual);
-	// 			for(State suc: sucs)
-	// 				if(!fechados.contains(suc))
-	// 					abertos.add(suc);
-	// 		}
-	// 	}
-	// 	return null;
-	// }
+	private int getMillisForCurrentLevel() {
+		return 2 * (this.level - 1) + 1;
+	}
+
+	final private List<State> sucessores(State n){
+		List<State> sucs = new ArrayList<>();
+		List<Ilayout> children = n.layout.children();
+		for(Ilayout e : children){
+			if(n.father == null || !e.equals(n.father.layout)){
+				State nn = new State(e, n, this.opponent);
+				sucs.add(nn);
+			}
+		}
+		return sucs;
+	}
+
+	private double uctValue(int totalVisits, double stateWinScore, int stateVisits) {
+		if(stateVisits == 0) {
+			return Integer.MAX_VALUE;
+		}
+		return (stateWinScore / (double) stateVisits) + 1.41 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
+	}
+
+	private State selectPromisingState(State s, List<State> sucs) {
+		State state = s;
+		int parentVisits = state.getVisits();
+		//System.out.println(sucs.toString());
+		return sucs.size() > 0 ? s : Collections.max(sucs, Comparator.comparing(c -> uctValue(parentVisits, state.getWins(), state.getVisits())));
+	}
+
+	private char simulateRandomPlayout(State state) {
+		TicTacToe t = new TicTacToe(state.toString());
+
+		if(t.winCheck(opponent)) {
+			return opponent;
+		}
+
+		while(!t.gameOver()) {
+			List<Integer> availablePositions = t.getEmptyPositions();
+			int move = (int) (Math.random() * availablePositions.size());
+			t.play(availablePositions.get(move));
+		}
+
+		return t.winCheck('X') ? 'X' : 'O';
+	}
+
+	private void backPropagation(State stateToExplore, char player) {
+		State tempState = stateToExplore;
+
+		while(tempState != null) {
+			tempState.visits++;
+			if(tempState.getPlayer() == player)
+				tempState.wins++;
+			tempState = tempState.father;
+		}
+	}
+
+	public Ilayout findNextMove(Ilayout layout, char player) {
+		long start = System.currentTimeMillis();
+		long end = start + 60 * getMillisForCurrentLevel();
+
+		opponent = player == 'O' ? 'X' : 'O';
+		State initialState = new State(layout, null, opponent);
+		List<State> currentSucs = sucessores(initialState);
+
+		int counter = 0;
+
+		while(System.currentTimeMillis() < end) {
+
+			//System.out.println(counter);
+			// Phase 1 - Selection
+			State promisingState = selectPromisingState(initialState, currentSucs);
+
+			// Phase 2 - Expansion
+			if(!((TicTacToe) layout).gameOver())
+				currentSucs = sucessores(promisingState);
+
+			// Phase 3 - Simulation
+			State stateToExplore = promisingState;
+			if(currentSucs.size() > 0) {
+				stateToExplore = currentSucs.get((int) Math.random() * currentSucs.size());
+			}
+			char playoutResult = simulateRandomPlayout(stateToExplore);
+
+			// Phase 4 - Update
+			backPropagation(stateToExplore, playoutResult);
+			counter++;
+		}
+
+		State winnerState = Collections.max(currentSucs, Comparator.comparing(c -> { return c.getVisits(); }));
+		initialState = winnerState;
+		return winnerState.layout;
+	}
 }

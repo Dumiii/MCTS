@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -316,7 +317,16 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 */
 	public double getRatio(char player){
 		return getWins(player)/getVisits();
-	}	
+	}
+	
+	public List<Integer> getEmptyPositions() {
+		List<Integer> emptyPositions = new ArrayList<>();
+		for(int i = 0; i < this.dim*this.dim; i++)
+			if(this.get(i%dim, i/dim) == emptyCell)
+				emptyPositions.add(i);
+				
+		return emptyPositions;
+	}
 
 	/**
 	 * @param other object (assumed to be of the same type) to eval
