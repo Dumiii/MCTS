@@ -112,8 +112,6 @@ class MCTS {
 		State initialState = new State(layout, null, opponent);
 		List<State> currentSucs = sucessores(initialState);
 
-		int counter = 0;
-
 		while(System.currentTimeMillis() < end) {
 
 			//System.out.println(counter);
@@ -133,7 +131,6 @@ class MCTS {
 
 			// Phase 4 - Update
 			backPropagation(stateToExplore, playoutResult);
-			counter++;
 		}
 
 		State winnerState = Collections.max(currentSucs, Comparator.comparing(c -> { return c.getVisits(); }));
