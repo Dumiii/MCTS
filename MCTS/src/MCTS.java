@@ -55,16 +55,16 @@ class MCTS {
 		}
 	}
 
-	private int level;
+	private int simulations;
 	private char player;
 	private char opponent;
 	
-	public MCTS() {
-		this.level = 3;
+	public MCTS(int simulations) {
+		this.simulations = simulations;
 	}
 
-	private int getMillisForCurrentLevel() {
-		return 2 * (this.level - 1) + 1;
+	public int getSimulations() {
+		return this.simulations;
 	}
 
 	final private List<State> sucessores(State n){
@@ -123,7 +123,7 @@ class MCTS {
 		TicTacToe t = new TicTacToe(state.toString());
 
 		if(t.winCheck(this.opponent)) {
-			state.father.setWinScore(-1);
+			state.father.setWinScore(Integer.MIN_VALUE);
 			return this.opponent;
 		}
 
@@ -136,21 +136,18 @@ class MCTS {
 		// System.out.println(t.drawCheck() ? "GAME ENDED IN A DRAW" : t.winCheck(player) ? "PLAYER WON": "OPPONENT WON");
 		// System.out.println();
 
-		return t.winCheck(player) ? player : opponent;
+		return t.drawCheck() ? '-' : (t.winCheck(player) ? player : opponent);
 	}
 
 	private void backPropagation(State stateToExplore, char playoutResult) {
 		stateToExplore.incrementVisits();
 		if(stateToExplore.getPlayer() == playoutResult)
-			stateToExplore.addScore(1);
+			stateToExplore.addScore(10);
 		if(stateToExplore.father != null)
 			backPropagation(stateToExplore.father, playoutResult);
 	}
 
 	public Ilayout findNextMove(Ilayout layout, char player) {
-		long start = System.currentTimeMillis();
-		long end = start + 60 * getMillisForCurrentLevel();
-
 		this.player = player;
 		this.opponent = player == 'O' ? 'X' : 'O';
 		State initialState = new State(layout, null, player);
@@ -158,7 +155,7 @@ class MCTS {
 
 		List<State> stateToExploreChildren = new ArrayList<>();
 
-		while(System.currentTimeMillis() < end) {
+		for(int i = 0; i < this.getSimulations(); i++){
 
 			// Phase 1 - Selection
 			State promisingState = selectPromisingState(initialState);
@@ -166,6 +163,9 @@ class MCTS {
 			// Phase 2 - Expansion
 			if(!((TicTacToe) promisingState.layout).gameOver()) {
 				stateToExploreChildren = sucessores(promisingState);
+			}
+			else{
+				return promisingState.layout;
 			}
 
 			// Phase 3 - Simulation
@@ -177,14 +177,6 @@ class MCTS {
 
 			// Phase 4 - Update
 			backPropagation(stateToExplore, playoutResult);
-
-			// for(State state : stateToExploreChildren) {
-			// 	System.out.println("'''''''''''''''''''''''''''''''''''''''''");
-			// 	System.out.println(state.layout.toString());
-			// 	System.out.println("I GOT VISITED      " + state.getVisits() + "TIMES.");
-			// 	System.out.println();
-			// 	System.out.println();
-			// }
 		}
 
 		State winnerState = Collections.max(stateToExploreChildren, Comparator.comparing(c -> { return c.getVisits(); }));
