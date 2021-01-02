@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 class MCTS {
 	static class State{
@@ -9,17 +10,19 @@ class MCTS {
 		private State father;
 		private char player;
 		private int visits;
-		private int wins;
+		private int winScore;
 
 		public State(Ilayout l, State n, char player) {
 			this.layout = l;
 			this.father = n;
 			this.player = player;
-			if(((TicTacToe) layout).winCheck(player)){
-				this.wins = 1;
-			}
 			if(father != null){
 				this.visits = father.visits + l.getVisits();
+				this.winScore = father.winScore + l.getWins(player);
+			}
+			else {
+				this.visits = 0;
+				this.winScore = 0;
 			}
 		}
 
@@ -35,12 +38,25 @@ class MCTS {
 			return visits;
 		}
 
-		public int getWins() {
-			return wins;
+		public void incrementVisits() {
+			this.visits++;
+		}
+
+		public int getWinScore() {
+			return winScore;
+		}
+
+		public void setWinScore(int winScore) {
+			this.winScore = winScore;
+		}
+
+		public void addScore(int score) {
+			this.winScore += score;
 		}
 	}
 
 	private int level;
+	private char player;
 	private char opponent;
 	
 	public MCTS() {
@@ -56,32 +72,59 @@ class MCTS {
 		List<Ilayout> children = n.layout.children();
 		for(Ilayout e : children){
 			if(n.father == null || !e.equals(n.father.layout)){
-				State nn = new State(e, n, this.opponent);
+				State nn = new State(e, n, n.getPlayer() == 'X' ? 'O' : 'X');
 				sucs.add(nn);
 			}
 		}
 		return sucs;
 	}
 
-	private double uctValue(int totalVisits, double stateWinScore, int stateVisits) {
-		if(stateVisits == 0) {
-			return Integer.MAX_VALUE;
+	private double getUctValue(State state) {
+		double uctValue;
+
+		if(state.getVisits() == 0) {
+			uctValue = 1;
 		}
-		return (stateWinScore / (double) stateVisits) + 1.41 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
+		else {
+			uctValue
+                = (1.0 * state.getWinScore()) / (state.getVisits() * 1.0)
+                + (Math.sqrt(2 * (Math.log(state.father.getVisits() * 1.0) / state.getVisits())));
+		}
+
+		Random r = new Random();
+		uctValue += (r.nextDouble() / 10000000);
+		return uctValue;
 	}
 
-	private State selectPromisingState(State s, List<State> sucs) {
-		State state = s;
-		int parentVisits = state.getVisits();
-		//System.out.println(sucs.toString());
-		return sucs.size() > 0 ? s : Collections.max(sucs, Comparator.comparing(c -> uctValue(parentVisits, state.getWins(), state.getVisits())));
+	// private State selectPromisingState(State s) {
+	// 	State state = s;
+	// 	int parentVisits = state.getVisits();
+	// 	return Collections.max(sucessores(state), Comparator.comparing(c -> uctValue(parentVisits, state.getWinScore(), state.getVisits())));
+	// }
+
+	private State selectPromisingState(State s) {
+		State selectedState = s;
+		double max = Integer.MIN_VALUE;
+		List<State> children = sucessores(selectedState);
+
+		for(State state : children) {
+			double uctValue = getUctValue(state);
+
+			if(uctValue > max) {
+				max = uctValue;
+				selectedState = state;
+			}
+		}
+
+		return selectedState;
 	}
 
 	private char simulateRandomPlayout(State state) {
 		TicTacToe t = new TicTacToe(state.toString());
 
-		if(t.winCheck(opponent)) {
-			return opponent;
+		if(t.winCheck(this.opponent)) {
+			state.father.setWinScore(-1);
+			return this.opponent;
 		}
 
 		while(!t.gameOver()) {
@@ -90,51 +133,62 @@ class MCTS {
 			t.play(availablePositions.get(move));
 		}
 
-		return t.winCheck('X') ? 'X' : 'O';
+		// System.out.println(t.drawCheck() ? "GAME ENDED IN A DRAW" : t.winCheck(player) ? "PLAYER WON": "OPPONENT WON");
+		// System.out.println();
+
+		return t.winCheck(player) ? player : opponent;
 	}
 
-	private void backPropagation(State stateToExplore, char player) {
-		State tempState = stateToExplore;
-
-		while(tempState != null) {
-			tempState.visits++;
-			if(tempState.getPlayer() == player)
-				tempState.wins++;
-			tempState = tempState.father;
-		}
+	private void backPropagation(State stateToExplore, char playoutResult) {
+		stateToExplore.incrementVisits();
+		if(stateToExplore.getPlayer() == playoutResult)
+			stateToExplore.addScore(1);
+		if(stateToExplore.father != null)
+			backPropagation(stateToExplore.father, playoutResult);
 	}
 
 	public Ilayout findNextMove(Ilayout layout, char player) {
 		long start = System.currentTimeMillis();
 		long end = start + 60 * getMillisForCurrentLevel();
 
-		opponent = player == 'O' ? 'X' : 'O';
-		State initialState = new State(layout, null, opponent);
-		List<State> currentSucs = sucessores(initialState);
+		this.player = player;
+		this.opponent = player == 'O' ? 'X' : 'O';
+		State initialState = new State(layout, null, player);
+		// List<State> currentSucs = sucessores(initialState);
+
+		List<State> stateToExploreChildren = new ArrayList<>();
 
 		while(System.currentTimeMillis() < end) {
 
-			//System.out.println(counter);
 			// Phase 1 - Selection
-			State promisingState = selectPromisingState(initialState, currentSucs);
-
+			State promisingState = selectPromisingState(initialState);
+			
 			// Phase 2 - Expansion
-			if(!((TicTacToe) layout).gameOver())
-				currentSucs = sucessores(promisingState);
+			if(!((TicTacToe) promisingState.layout).gameOver()) {
+				stateToExploreChildren = sucessores(promisingState);
+			}
 
 			// Phase 3 - Simulation
 			State stateToExplore = promisingState;
-			if(currentSucs.size() > 0) {
-				stateToExplore = currentSucs.get((int) Math.random() * currentSucs.size());
+			if(stateToExploreChildren.size() > 0) {
+				stateToExplore = stateToExploreChildren.get((int) Math.random() * stateToExploreChildren.size());
 			}
 			char playoutResult = simulateRandomPlayout(stateToExplore);
 
 			// Phase 4 - Update
 			backPropagation(stateToExplore, playoutResult);
+
+			// for(State state : stateToExploreChildren) {
+			// 	System.out.println("'''''''''''''''''''''''''''''''''''''''''");
+			// 	System.out.println(state.layout.toString());
+			// 	System.out.println("I GOT VISITED      " + state.getVisits() + "TIMES.");
+			// 	System.out.println();
+			// 	System.out.println();
+			// }
 		}
 
-		State winnerState = Collections.max(currentSucs, Comparator.comparing(c -> { return c.getVisits(); }));
+		State winnerState = Collections.max(stateToExploreChildren, Comparator.comparing(c -> { return c.getVisits(); }));
 		initialState = winnerState;
-		return winnerState.layout;
+		return winnerState.father.layout;
 	}
 }

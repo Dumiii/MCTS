@@ -24,6 +24,6 @@ public class Client {
 			System.out.println("Switching player");
 		}
 		sc.close();
-		System.out.println("Game ended, goodbye!");
+		System.out.println("Game ended, player" + " " + (t.winCheck('X') ? 'X' : 'O') + " " + "won. Goodbye!");
 	}
 }
