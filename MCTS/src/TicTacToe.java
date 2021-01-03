@@ -28,8 +28,8 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 * char p2 is the player with the 'X' cell
 	 */
 	private final char emptyCell = '-';
-	private final char p1 = 'O';
-	private final char p2 = 'X';
+	private final char p1 = 'X';
+	private final char p2 = 'O';
 
 	/**
 	 * char turn is the current player turn in this instance
@@ -74,7 +74,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 * populates the score map by counting the number of 'X's and 'O's in the board
 	 * @return a map with the keys 'O' and 'X' and the respective amount of each in the board
 	 */
-	private Map<Character, Integer> countScore(){
+	public Map<Character, Integer> countScore(){
 		Map<Character, Integer> result = new HashMap<>(2);
 		result.put(p1, 0);
 		result.put(p2, 0);
