@@ -38,8 +38,11 @@ public class TicTacToe implements Ilayout, Cloneable {
 	private char turn = p1;
 	private Map<Character, Integer> score;
 
-
-	private int lastPlayed;
+	/**
+	 * holds the cell number in which the last move was done
+	 * exists in [0, dim*dim)
+	 */
+	public int lastPlayed;
 	/**
 	 * default constructor which starts a game from the begining aka with an empty board
 	 */
