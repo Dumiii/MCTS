@@ -152,7 +152,7 @@ class MCTS {
 	}
 
 	public int getSimulations() {
-		return this.simulations;
+		return 5000;
 	}
 	
 
@@ -160,7 +160,7 @@ class MCTS {
 		if(stateVisits == 0) {
 			return Integer.MAX_VALUE;
 		}
-		return (stateWinScore / (double) stateVisits) + 7 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
+		return (stateWinScore / (double) stateVisits) + 5.8 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
 	}
 
 	private State bestStateUCT(State state) {
@@ -287,14 +287,14 @@ class MCTS {
 		// State winnerState = Collections.max(stateToExploreChildren, Comparator.comparing(c -> { return c.getVisits(); }));
 		// initialState = winnerState;
 		State winnerState = initialState.getChildWithMaxScore();
-		for(State state : initialState.getChildArray()) {
-			System.out.println(state.getVisits());
-			// System.out.println(state.toString());
-			// System.out.println();
-			// System.out.println();
-			// System.out.println();
-// 
-		}
+// 		for(State state : initialState.getChildArray()) {
+// 			System.out.println(state.getVisits());
+// 			// System.out.println(state.toString());
+// 			// System.out.println();
+// 			// System.out.println();
+// 			// System.out.println();
+// // 
+// 		}
 		tree.setRoot(winnerState);
 		return winnerState.getLayout();
 	}

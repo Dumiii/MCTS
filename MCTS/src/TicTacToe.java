@@ -39,12 +39,13 @@ public class TicTacToe implements Ilayout, Cloneable {
 	private Map<Character, Integer> score;
 
 
-	private int lastPlayed = 0;
+	private int lastPlayed;
 	/**
 	 * default constructor which starts a game from the begining aka with an empty board
 	 */
 	TicTacToe(){
 		init();
+		this.lastPlayed = 0;
 	}
 
 	/**
@@ -69,6 +70,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 				}
 			}
 		}
+		this.lastPlayed = 0;
 		determineTurn();
 	}
 
@@ -197,6 +199,10 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 */
 	public char getTurn(){
 		return this.turn;
+	}
+
+	public int getLastPlayed() {
+		return lastPlayed;
 	}
 
 	/**
