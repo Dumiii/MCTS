@@ -5,30 +5,6 @@ import java.util.List;
 
 class MCTS {
 
-	static class Tree {
-		State root;
-
-		public Tree() {
-			root = new State();
-		}
-
-		public Tree(State root) {
-			this.root = root;
-		}
-
-		public State getRoot() {
-			return root;
-		}
-
-		public void setRoot(State root) {
-			this.root = root;
-		}
-
-		public void addChild(State parent, State child) {
-			parent.getChildArray().add(child);
-		}
-	}
-
 	static class State{
 		private Ilayout layout;
 		private State father;
@@ -143,10 +119,10 @@ class MCTS {
 	}
 
 	private final int WIN_SCORE = 10;
+	private final double EXPLORATION_FACTOR = 4 * Math.sqrt(2);
 	private int simulations;
 	private char player;
 	private char opponent;
-	private final double EXPLORATION_FACTOR = 4 * Math.sqrt(2);
 	
 	public MCTS(int simulations) {
 		this.simulations = simulations;
