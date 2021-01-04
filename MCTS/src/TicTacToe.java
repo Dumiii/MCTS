@@ -104,7 +104,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 * @param x coordinate to eval
 	 * @return true if x exists in [0, dim), false otherwise
 	 */
-	private boolean inBounds(int x){
+	public boolean inBounds(int x){
 		return x >= 0 && x < dim;
 	}
 
@@ -113,7 +113,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 * @param c - char to eval
 	 * @return true if c is 'O' or 'X'
 	 */
-	private boolean isValidPlayer(char c){
+	public boolean isValidPlayer(char c){
 		return c == p1 || c == p2;
 	}
 
@@ -122,7 +122,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 * @param c - char to eval
 	 * @return true if c is 'O', 'X', or '-'
 	 */
-	private boolean isValidCharacter(char c){
+	public boolean isValidCharacter(char c){
 		return isValidPlayer(c) || c == emptyCell;
 	}
 

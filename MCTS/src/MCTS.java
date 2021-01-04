@@ -14,23 +14,23 @@ class MCTS {
 		private List<State> childArray;
 
 		public State() {
-			this.layout = new TicTacToe();
-			childArray = new ArrayList<>();
+			this.setLayout(new TicTacToe());
+			this.setChildArray(new ArrayList<>());
 		}
 
 		public State(Ilayout layout) {
-			this.layout = layout;
-			childArray = new ArrayList<>();
+			this.setLayout(layout);
+			this.setChildArray(new ArrayList<>());
 		}
 
 		public State(Ilayout layout, State father, List<State> childArray) {
-			this.layout = layout;
-			this.father = father;
-			this.childArray = childArray;
+			this.setLayout(layout);
+			this.setFather(father);
+			this.setChildArray(childArray);
 		}
 
 		public State(State state) {
-			this.childArray = new ArrayList<>();
+			this.setChildArray(new ArrayList<>());
 			this.layout = state.getLayout();
 			if(state.getFather() != null)
 				this.father = state.getFather();
@@ -64,12 +64,17 @@ class MCTS {
 			return childArray;
 		}
 
+		public void setChildArray(List<State> childArray) {
+			this.childArray = childArray;
+		}
+
 		public char getPlayer() {
 			return player;
 		}
 
 		public void setPlayer(char player) {
-			this.player = player;
+			if(((TicTacToe) layout).isValidPlayer(player))
+				this.player = player;
 		}
 
 		public char getOpponent() {
@@ -119,7 +124,7 @@ class MCTS {
 	}
 
 	private final int WIN_SCORE = 10;
-	private final double EXPLORATION_FACTOR = 4 * Math.sqrt(2);
+	private double EXPLORATION_FACTOR = 4 * Math.sqrt(2);
 	private int simulations;
 	private char player;
 	private char opponent;
