@@ -5,30 +5,6 @@ import java.util.List;
 
 class MCTS {
 
-	static class Tree {
-		State root;
-
-		public Tree() {
-			root = new State();
-		}
-
-		public Tree(State root) {
-			this.root = root;
-		}
-
-		public State getRoot() {
-			return root;
-		}
-
-		public void setRoot(State root) {
-			this.root = root;
-		}
-
-		public void addChild(State parent, State child) {
-			parent.getChildArray().add(child);
-		}
-	}
-
 	static class State{
 		private Ilayout layout;
 		private State father;
@@ -143,6 +119,7 @@ class MCTS {
 	}
 
 	private final int WIN_SCORE = 10;
+	private final double EXPLORATION_FACTOR = 4 * Math.sqrt(2);
 	private int simulations;
 	private char player;
 	private char opponent;
@@ -152,37 +129,21 @@ class MCTS {
 	}
 
 	public int getSimulations() {
-		return 5000;
+		return simulations;
 	}
 	
 
-	public double uctValue(int totalVisits, double stateWinScore, int stateVisits) {
+	private double uctValue(int totalVisits, double stateWinScore, int stateVisits) {
 		if(stateVisits == 0) {
 			return Integer.MAX_VALUE;
 		}
-		return (stateWinScore / (double) stateVisits) + 5.8 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
+		return (stateWinScore / (double) stateVisits) + EXPLORATION_FACTOR * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
 	}
 
 	private State bestStateUCT(State state) {
 		int parentVisits = state.getVisits();
 		return Collections.max(state.getChildArray(), Comparator.comparing(c -> uctValue(parentVisits, c.getWinScore(), c.getVisits())));
 	}
-
-	// private State selectPromisingState(State s) {
-	// 	State selectedState = s;
-	// 	double max = Integer.MIN_VALUE;
-
-	// 	for(State state : sucessores(s)) {
-	// 		double uctValue = getUctValue(state);
-
-	// 		if(uctValue > max) {
-	// 			max = uctValue;
-	// 			selectedState = state;
-	// 		}
-	// 	}
-
-	// 	return selectedState;
-	// }
 
 	private State selectPromisingState(State rootState) {
 		State state = rootState;
@@ -193,12 +154,12 @@ class MCTS {
 
 	private void expandState(State state) {
 		List<State> possibleStates = state.sucessores();
-		possibleStates.forEach(s -> {
+		for(State s : possibleStates) {
 			State newState = new State(s);
 			newState.setFather(state);
 			newState.setPlayer(state.getOpponent());
 			state.getChildArray().add(newState);
-		});
+		}
 	}
 
 	private void backPropagation(State stateToExplore, char playoutResult) {
@@ -225,27 +186,8 @@ class MCTS {
 			t.play(availablePositions.get(move));
 		}
 
-		// System.out.println(t.drawCheck() ? "GAME ENDED IN A DRAW" : t.winCheck(player) ? "PLAYER WON": "OPPONENT WON");
-		// System.out.println();
-
 		return t.drawCheck() ? '-' : (t.winCheck(player) ? player : opponent);
 	}
-
-	// private void backPropagation(State stateToExplore, char playoutResult) {
-	// 	stateToExplore.incrementVisits();
-	// 	// Map<Character, Integer> cona =  ((TicTacToe) stateToExplore.layout).countScore();
-	// 	// if(cona.get('O') + cona.get('X') == 2)
-	// 		// System.out.println(stateToExplore.getVisits());
-	// 	char opponent = playoutResult == '-' ? '-' : (playoutResult == 'X' ? 'O' : 'X');
-	// 	if(stateToExplore.getPlayer() == playoutResult)
-	// 		stateToExplore.addScore(1);
-	// 	else if(stateToExplore.getPlayer() == opponent)
-	// 		stateToExplore.addScore(-1);
-	// 	else
-	// 		stateToExplore.addScore(0);
-	// 	if(stateToExplore.father != null)
-	// 		backPropagation(stateToExplore.father, playoutResult);
-	// }
 
 	public Ilayout findNextMove(Ilayout layout, char player) {
 		this.player = player;
@@ -260,8 +202,6 @@ class MCTS {
 
 			// Phase 1 - Selection
 			State promisingState = selectPromisingState(initialState);
-
-			// System.out.println(promisingState.toString());
 			
 			// Phase 2 - Expansion
 			if(!((TicTacToe) promisingState.getLayout()).gameOver())
@@ -278,23 +218,7 @@ class MCTS {
 			backPropagation(stateToExplore, playoutResult);
 		}
 
-		// List<State> whatever = sucessores(initialState);
-
-		// for(State state : stateToExploreChildren)
-		// 	System.out.println(state.father.father.getVisits());
-
-
-		// State winnerState = Collections.max(stateToExploreChildren, Comparator.comparing(c -> { return c.getVisits(); }));
-		// initialState = winnerState;
 		State winnerState = initialState.getChildWithMaxScore();
-// 		for(State state : initialState.getChildArray()) {
-// 			System.out.println(state.getVisits());
-// 			// System.out.println(state.toString());
-// 			// System.out.println();
-// 			// System.out.println();
-// 			// System.out.println();
-// // 
-// 		}
 		tree.setRoot(winnerState);
 		return winnerState.getLayout();
 	}

@@ -13,7 +13,7 @@ public class Client {
 		while(t.drawCheck() || !t.gameOver()){
 			t = new TicTacToe();
 			
-			MCTS m = new MCTS(1000);
+			MCTS m = new MCTS(1750);
 
 			while(!t.gameOver()) {
 				//System.out.println("The MCTS algorithm suggests the following move for you to play: ");
