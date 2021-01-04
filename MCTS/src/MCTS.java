@@ -117,7 +117,8 @@ class MCTS {
 		}
 
 		public void addScore(int score) {
-			this.winScore += score;
+			if(this.winScore != Integer.MIN_VALUE)
+				this.winScore += score;
 		}
 
 		public List<State> sucessores() {
@@ -159,7 +160,7 @@ class MCTS {
 		if(stateVisits == 0) {
 			return Integer.MAX_VALUE;
 		}
-		return (stateWinScore / (double) stateVisits) + 1.41 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
+		return (stateWinScore / (double) stateVisits) + 7 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
 	}
 
 	private State bestStateUCT(State state) {
@@ -213,6 +214,11 @@ class MCTS {
 	private char simulateRandomPlayout(State state) {
 		TicTacToe t = new TicTacToe(state.toString());
 
+		if(t.winCheck(this.opponent)){
+			state.getFather().setWinScore(Integer.MIN_VALUE);
+			return this.opponent;
+		}
+		
 		while(!t.gameOver()) {
 			List<Integer> availablePositions = t.getEmptyPositions();
 			int move = (int) (Math.random() * availablePositions.size());
@@ -277,26 +283,18 @@ class MCTS {
 		// for(State state : stateToExploreChildren)
 		// 	System.out.println(state.father.father.getVisits());
 
-		// for(State state : whatever) {
-			// System.out.println("STATE VISITS    " + state.getVisits());
-			// System.out.println();
-			// System.out.println(state.toString());
-			// System.out.println("--------------------------------------------");
-			// System.out.println();
-			// System.out.println();
-		// }
 
 		// State winnerState = Collections.max(stateToExploreChildren, Comparator.comparing(c -> { return c.getVisits(); }));
 		// initialState = winnerState;
 		State winnerState = initialState.getChildWithMaxScore();
-		// for(State state : initialState.getChildArray()) {
-			// System.out.println(state.getVisits());
+		for(State state : initialState.getChildArray()) {
+			System.out.println(state.getVisits());
 			// System.out.println(state.toString());
 			// System.out.println();
 			// System.out.println();
 			// System.out.println();
 // 
-		// }
+		}
 		tree.setRoot(winnerState);
 		return winnerState.getLayout();
 	}

@@ -10,7 +10,7 @@ public class Client {
 
 		TicTacToe t = new TicTacToe();
 		
-		MCTS m = new MCTS(50000);
+		MCTS m = new MCTS(400);
 
 		while(!t.gameOver()) {
 			System.out.println("The MCTS algorithm suggests the following move for you to play: ");
