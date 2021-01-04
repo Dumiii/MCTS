@@ -38,6 +38,8 @@ public class TicTacToe implements Ilayout, Cloneable {
 	private char turn = p1;
 	private Map<Character, Integer> score;
 
+
+	private int lastPlayed = 0;
 	/**
 	 * default constructor which starts a game from the begining aka with an empty board
 	 */
@@ -173,6 +175,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 		if(isValidPlayer(this.get(x, y)))
 			throw new IllegalArgumentException("this cell is already occupied by "+this.get(x, y));
 		this.set(x, y, player);
+		this.lastPlayed = y*dim + x;
 		score.put(player, score.get(player)+1);
 		determineTurn();
 	}
