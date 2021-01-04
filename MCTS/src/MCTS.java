@@ -146,13 +146,14 @@ class MCTS {
 	private int simulations;
 	private char player;
 	private char opponent;
+	private final double EXPLORATION_FACTOR = 4 * Math.sqrt(2);
 	
 	public MCTS(int simulations) {
 		this.simulations = simulations;
 	}
 
 	public int getSimulations() {
-		return 5000;
+		return simulations;
 	}
 	
 
@@ -160,7 +161,7 @@ class MCTS {
 		if(stateVisits == 0) {
 			return Integer.MAX_VALUE;
 		}
-		return (stateWinScore / (double) stateVisits) + 5.8 * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
+		return (stateWinScore / (double) stateVisits) + EXPLORATION_FACTOR * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
 	}
 
 	private State bestStateUCT(State state) {
