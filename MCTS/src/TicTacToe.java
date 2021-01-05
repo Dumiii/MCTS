@@ -81,7 +81,7 @@ public class TicTacToe implements Ilayout, Cloneable {
 	 * populates the score map by counting the number of 'X's and 'O's in the board
 	 * @return a map with the keys 'O' and 'X' and the respective amount of each in the board
 	 */
-	public Map<Character, Integer> countScore(){
+	private Map<Character, Integer> countScore(){
 		Map<Character, Integer> result = new HashMap<>(2);
 		result.put(p1, 0);
 		result.put(p2, 0);
@@ -197,6 +197,14 @@ public class TicTacToe implements Ilayout, Cloneable {
 	}
 
 	/**
+	 * uses function playTurn(x, y) but instead of x and y it's a single argument that represents a space in the board
+	 * @param i int i is split into: i%dim which represents x and i/dim which represents y in the function playTurn(x, y)
+	 */
+	public void play(int i){
+		this.play(i%dim, i/dim);
+	}
+
+	/**
 	 * gets the turn
 	 * @return the local turn variable
 	 */
@@ -204,16 +212,12 @@ public class TicTacToe implements Ilayout, Cloneable {
 		return this.turn;
 	}
 
+	/**
+	 * gets the cell that was last played
+	 * @return the last turn of this config
+	 */
 	public int getLastPlayed() {
 		return lastPlayed;
-	}
-
-	/**
-	 * uses function playTurn(x, y) but instead of x and y it's a single argument that represents a space in the board
-	 * @param i int i is split into: i%dim which represents x and i/dim which represents y in the function playTurn(x, y)
-	 */
-	public void play(int i){
-		this.play(i%dim, i/dim);
 	}
 
 	/**
@@ -322,15 +326,6 @@ public class TicTacToe implements Ilayout, Cloneable {
 		return winCheck(player) ? 1 : 0;
 	}
 
-	//TODO TESTS
-	/**
-	 * @param player char representing the player whose ratio of wins/visits will be returned
-	 * @return ratio of wins and vistis
-	 */
-	public double getRatio(char player){
-		return getWins(player)/getVisits();
-	}
-	
 	public List<Integer> getEmptyPositions() {
 		List<Integer> emptyPositions = new ArrayList<>();
 		for(int i = 0; i < this.dim*this.dim; i++)
