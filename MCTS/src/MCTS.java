@@ -377,7 +377,7 @@ class MCTS {
 	 * finds the best move from a given layout and player
 	 * @param layout the game config in Ilayout
 	 * @param player char representing the player that is about to play
-	 * @return a Ilayout representing the move
+	 * @return a Ilayout that contains the move
 	 */
 	public Ilayout findNextMove(Ilayout layout, char player) {
 		this.player = player;
