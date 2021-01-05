@@ -21,4 +21,10 @@ interface Ilayout{
 	 * @return amount of visits
 	 */
 	int getVisits();
+
+	/**
+	 * @param player char that represents the player
+	 * @return whether or not the arg is a valid player
+	 */
+	boolean isValidPlayer(char player);
 }

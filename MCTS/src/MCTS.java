@@ -3,32 +3,84 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Class responsible for implementing the Monte Carlo Tree Search algorithm
+ */
 class MCTS {
 
+	/**
+	 * State class which the tree is made out of
+	 * holds the config of the game and information for the MCTS algo
+	 */
 	static class State{
+
+		/**
+		 * Game config
+		 */
 		private Ilayout layout;
+		
+		/**
+		 * State parent
+		 */
 		private State father;
+
+		/**
+		 * Indicates which player this State belongs to
+		 */
 		private char player;
+
+		/**
+		 * amount of visits this instance has had
+		 */
 		private int visits;
+
+		/**
+		 * current win score of this state
+		 */
 		private int winScore;
+
+		/**
+		 * children of this state instance
+		 */
 		private List<State> childArray;
 
+		/**
+		 * default constructor
+		 * sets the layout to an empty board
+		 * sets child array to empty arraylist
+		 */
 		public State() {
 			this.setLayout(new TicTacToe());
 			this.setChildArray(new ArrayList<>());
 		}
 
+		/**
+		 * Constructor that recives a game config
+		 * Sets child array to empty arraylist
+		 * @param layout Ilayout that reprensents the config of the game
+		 */
 		public State(Ilayout layout) {
 			this.setLayout(layout);
 			this.setChildArray(new ArrayList<>());
 		}
 
+		/**
+		 * Constructor that recieves a game config, a father, and a child array
+		 * @param layout Ilayout that reprensents the config of the game
+		 * @param father State that will be the father of this instance
+		 * @param childArray List of states that will be this state's children
+		 */
 		public State(Ilayout layout, State father, List<State> childArray) {
 			this.setLayout(layout);
 			this.setFather(father);
 			this.setChildArray(childArray);
 		}
 
+		/**
+		 * Consturctor that takes a state and copies it
+		 * effectively clones the argument
+		 * @param state the State that will have its properties copied
+		 */
 		public State(State state) {
 			this.setChildArray(new ArrayList<>());
 			this.layout = state.getLayout();
@@ -40,43 +92,82 @@ class MCTS {
 			}
 		}
 
+		/**
+		 * uses the layout's toString method
+		 * @return the layout as a string
+		 */
 		public String toString(){
 			return layout.toString();
 		}
 
+		/**
+		 * getter for the layout
+		 * @return this instance's layout
+		 */
 		public Ilayout getLayout() {
 			return layout;
 		}
 
+		/**
+		 * setter for the layout
+		 * @param layout takes a Ilayout game config
+		 */
 		public void setLayout(Ilayout layout) {
 			this.layout = layout;
 		}
 
+		/**
+		 * getter for this state's father
+		 * @return State father
+		 */
 		public State getFather() {
 			return father;
 		}
 
+		/**
+		 * setter for this state's father
+		 * @param father State to be set as father
+		 */
 		public void setFather(State father) {
 			this.father = father;
 		}
 
+		/**
+		 * getter for the list of children
+		 * @return this state's list of children
+		 */
 		public List<State> getChildArray() {
 			return childArray;
 		}
 
+		/**
+		 * setter for the list of children
+		 * @param childArray list of children
+		 */
 		public void setChildArray(List<State> childArray) {
 			this.childArray = childArray;
 		}
 
+		/**
+		 * getter for player
+		 * @return player as character
+		 */
 		public char getPlayer() {
 			return player;
 		}
 
+		/**
+		 * setter for player
+		 * @param player a char representing the player (either 'O' or 'X')
+		 */
 		public void setPlayer(char player) {
-			if(((TicTacToe) layout).isValidPlayer(player))
+			if(layout.isValidPlayer(player))
 				this.player = player;
 		}
 
+		/**
+		 * @return char representing the opponent of the player of the current player
+		 */
 		public char getOpponent() {
 			return player == 'X' ? 'O' : 'X';
 		}
@@ -209,7 +300,7 @@ class MCTS {
 			State promisingState = selectPromisingState(initialState);
 			
 			// Phase 2 - Expansion
-			if(!((TicTacToe) promisingState.getLayout()).gameOver())
+			if(!(promisingState.getLayout().gameOver()))
 				expandState(promisingState);
 
 			// Phase 3 - Simulation
