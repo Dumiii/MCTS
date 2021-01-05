@@ -311,9 +311,9 @@ class MCTS {
 	}
 
 	/**
-	 * 
-	 * @param rootState
-	 * @return
+	 * selects the most promising state, starting from the root state
+	 * @param rootState the state from which to begin selection
+	 * @return a State in which the game is over
 	 */
 	private State selectPromisingState(State rootState) {
 		State state = rootState;
@@ -322,6 +322,10 @@ class MCTS {
 		return state;
 	}
 
+	/**
+	 * expands the given state by appending a list of possible states
+	 * @param state the State to expand
+	 */
 	private void expandState(State state) {
 		List<State> possibleStates = state.sucessores();
 		for(State s : possibleStates) {
@@ -332,6 +336,11 @@ class MCTS {
 		}
 	}
 
+	/**
+	 * propagates the rewards back up the tree to update all state statistics
+	 * @param stateToExplore a state that has the rewards that will be given to the father
+	 * @param playoutResult simulation result ['O', 'X', '-'], '-' represents draw
+	 */
 	private void backPropagation(State stateToExplore, char playoutResult) {
 		State tempState = stateToExplore;
 		while(tempState != null) {
@@ -342,6 +351,11 @@ class MCTS {
 		}
 	}
 
+	/**
+	 * simulates a random playout from a given state
+	 * @param state the state from which to start the simulation
+	 * @return char representing the player ('O' or 'X') that won the simulation or '-' if ended in a draw
+	 */
 	private char simulateRandomPlayout(State state) {
 		TicTacToe t = new TicTacToe(state.toString());
 
@@ -359,6 +373,12 @@ class MCTS {
 		return t.drawCheck() ? '-' : (t.winCheck(player) ? player : opponent);
 	}
 
+	/**
+	 * finds the best move from a given layout and player
+	 * @param layout the game config in Ilayout
+	 * @param player char representing the player that is about to play
+	 * @return a Ilayout representing the move
+	 */
 	public Ilayout findNextMove(Ilayout layout, char player) {
 		this.player = player;
 		this.opponent = player == 'O' ? 'X' : 'O';
