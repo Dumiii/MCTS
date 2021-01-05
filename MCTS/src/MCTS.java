@@ -172,27 +172,51 @@ class MCTS {
 			return player == 'X' ? 'O' : 'X';
 		}
 
+		/**
+		 * getter for the visits
+		 * @return an int representing the amount of visits this State has had
+		 */
 		public int getVisits() {
 			return visits;
 		}
 
+		/**
+		 * increments the visits for when this State is visitied in the algorithm
+		 */
 		public void incrementVisits() {
 			this.visits++;
 		}
-
+		
+		/**
+		 * getter for the win score
+		 * @return an int representing the win score of this node
+		 */
 		public int getWinScore() {
 			return winScore;
 		}
 
+		/**
+		 * setter for win score
+		 * @param winScore and int representing the new win score of this state
+		 */
 		public void setWinScore(int winScore) {
 			this.winScore = winScore;
 		}
 
+		/**
+		 * part of the backpropagation phase
+		 * updates this State's score if it isn't a losing state
+		 * @param score an int representing the score
+		 */
 		public void addScore(int score) {
 			if(this.winScore != Integer.MIN_VALUE)
 				this.winScore += score;
 		}
 
+		/**
+		 * generates the successors of this state
+		 * @return a list with the successors
+		 */
 		public List<State> sucessores() {
 			List<State> sucs = new ArrayList<>();
 			List<Ilayout> children = this.layout.children();
@@ -203,32 +227,72 @@ class MCTS {
 			return sucs;
 		}
 
+		/**
+		 * applies a random factor to chose a child
+		 * @return a random child state
+		 */
 		public State getRandomChildState() {
 			int possibleMoves =  this.childArray.size();
 			int randomSelect = (int) (Math.random() * possibleMoves);
 			return this.childArray.get(randomSelect);
 		}
 
+		/**
+		 * chooses the child with the max score
+		 * @return a State which is the child with the highest score
+		 */
 		public State getChildWithMaxScore() {
 			return Collections.max(this.childArray, Comparator.comparing(c -> { return c.getVisits(); }));
 		}
 	}
 
+	/**
+	 * score value to be added to a winning score
+	 */
 	private final int WIN_SCORE = 10;
+
+	/**
+	 * factor to be used in the uct value function
+	 */
 	private double EXPLORATION_FACTOR = 4 * Math.sqrt(2);
+
+	/**
+	 * number of simulations to be made for each turn
+	 */
 	private int simulations;
+
+	/**
+	 * a char that represents the player that the mcts algorithm is benefiting
+	 */
 	private char player;
+
+	/**
+	 * a char that represents the player that the mcts algorithm is fighting against
+	 */
 	private char opponent;
 	
+	/**
+	 * constructor that sets the simulations attribute
+	 * @param simulations int to be set as the simulations attribute
+	 */
 	public MCTS(int simulations) {
 		this.simulations = simulations;
 	}
 
+	/**
+	 * getter for simulations
+	 */
 	public int getSimulations() {
 		return simulations;
 	}
-	
 
+	/**
+	 * method that determins the upper confidence bound for the game tree
+	 * @param totalVisits parent state's visits
+	 * @param stateWinScore win score of current state
+	 * @param stateVisits visits of current state
+	 * @return double representing the uctValue
+	 */
 	private double uctValue(int totalVisits, double stateWinScore, int stateVisits) {
 		if(stateVisits == 0) {
 			return Integer.MAX_VALUE;
@@ -236,11 +300,21 @@ class MCTS {
 		return (stateWinScore / (double) stateVisits) + EXPLORATION_FACTOR * Math.sqrt(Math.log(totalVisits) / (double) stateVisits);
 	}
 
+	/**
+	 * Selects the child with the highest uctValue
+	 * @param state State whose children will be compared to find the highest uctValue
+	 * @return the child with the highest uct value
+	 */
 	private State bestStateUCT(State state) {
 		int parentVisits = state.getVisits();
 		return Collections.max(state.getChildArray(), Comparator.comparing(c -> uctValue(parentVisits, c.getWinScore(), c.getVisits())));
 	}
 
+	/**
+	 * 
+	 * @param rootState
+	 * @return
+	 */
 	private State selectPromisingState(State rootState) {
 		State state = rootState;
 		while(state.getChildArray().size() != 0)

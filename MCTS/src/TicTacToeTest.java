@@ -123,17 +123,17 @@ public class TicTacToeTest {
 	public void testPlay2(){
 		TicTacToe ttt = new TicTacToe();
 		char expectedCell = '-';
-		char expectedTurn = 'O';
+		char expectedTurn = 'X';
 		assertEquals(expectedCell, ttt.get(0, 1));
 		assertEquals(expectedTurn, ttt.getTurn());
-		char change = 'O';
-		expectedTurn = 'X';
+		char change = 'X';
+		expectedTurn = 'O';
 		ttt.play(0, 1);
 		assertEquals(change, ttt.get(0, 1));
 		assertEquals(expectedCell, ttt.get(2, 1));
 		assertEquals(expectedTurn, ttt.getTurn());
-		change = 'X';
-		expectedTurn = 'O';
+		change = 'O';
+		expectedTurn = 'X';
 		ttt.play(2, 1);
 		assertEquals(change, ttt.get(2, 1));
 		assertEquals(expectedCell, ttt.get(1, 1));
@@ -144,17 +144,17 @@ public class TicTacToeTest {
 	public void testPlay3(){
 		TicTacToe ttt = new TicTacToe();
 		char expectedCell = '-';
-		char expectedTurn = 'O';
+		char expectedTurn = 'X';
 		assertEquals(expectedCell, ttt.get(3));
 		assertEquals(expectedTurn, ttt.getTurn());
-		char change = 'O';
-		expectedTurn = 'X';
+		char change = 'X';
+		expectedTurn = 'O';
 		ttt.play(3);
 		assertEquals(change, ttt.get(3));
 		assertEquals(expectedCell, ttt.get(5));
 		assertEquals(expectedTurn, ttt.getTurn());
-		change = 'X';
-		expectedTurn = 'O';
+		change = 'O';
+		expectedTurn = 'X';
 		ttt.play(5);
 		assertEquals(change, ttt.get(5));
 		assertEquals(expectedCell, ttt.get(4));
@@ -177,12 +177,12 @@ public class TicTacToeTest {
 	@Test
 	public void testGetTurn(){
 		TicTacToe ttt = new TicTacToe();
-		char expectedTurn = 'O';
-		assertEquals(expectedTurn, ttt.getTurn());
-		expectedTurn = 'X';
-		ttt.play(0, 1);
+		char expectedTurn = 'X';
 		assertEquals(expectedTurn, ttt.getTurn());
 		expectedTurn = 'O';
+		ttt.play(0, 1);
+		assertEquals(expectedTurn, ttt.getTurn());
+		expectedTurn = 'X';
 		ttt.play(2, 1);
 		assertEquals(expectedTurn, ttt.getTurn());
 	}
@@ -353,17 +353,16 @@ public class TicTacToeTest {
 
 	@Test
 	public void testChildren(){
-		String input =	"-OO\n"+
-						"OO-\n"+
-						"XXX\n";
+		String input =	"X-X\n"+
+						"OXO\n"+
+						"OX-\n";
 		TicTacToe ttt = new TicTacToe(input);
-		String expected0 =	"XOO\n"+
-							"OO-\n"+
-							"XXX\n";
-
-		String expected1 =	"-OO\n"+
-							"OOX\n"+
-							"XXX\n";
+		String expected0 =	"XOX\n"+
+							"OXO\n"+
+							"OX-\n";
+		String expected1 =	"X-X\n"+
+							"OXO\n"+
+							"OXO\n";
 		List<Ilayout> result = ttt.children();
 		assertEquals(new TicTacToe(expected0), result.get(0));
 		assertEquals(new TicTacToe(expected1), result.get(1));
