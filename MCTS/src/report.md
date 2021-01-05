@@ -37,7 +37,7 @@ where:
 - $w_i$ is the number of wins scored in $i$;
 - $n_i$ is the number of simulations counted in $i$;
 - $t$ is the total number of simulations counted at the parent node of $i$;
-- $c$ is a user-defined exploration parameter, theoretically equal to $\sqrt{2}$.
+- $c$ is a user-defined exploration parameter.
 
 </br>
 
@@ -65,4 +65,20 @@ Our first step was to create a TicTacToe class capable of holding information an
 
 Afterwards, it was time to implement the Monte Carlo Tree Search. At first, we believed following the exact implementation for LAB 1 (Blocks World) would be a good idea, more specifically using a static State class and implementing a solve function that could solve any given board.
 
-However, we realized that we would begin to lose track of all the given states and would need a Tree class to be able to hold all of the states passed to it and keep track of all the updates.
+However, we realized that we would begin to lose track of all the given states and would need a Tree class to be able to hold all of the states passed to it and keep track of all the updates. Therefore, this was the final and chosen design option for our implementation.
+
+</br>
+
+# Results and their analysis
+
+To ensure that our algorithm would become unbeatable we wrote our client function so that it would play against itself indefinitely until a decisive outcome was reached (win or loss). Every time a decisive outcome was reached we would alter the number of iterations of the algorithm and in some cases the value of the exploration parameter $c$ until we were confident that all games in which the AI plays against itself would always end in a draw. After extensive testing and discussion, the following values were agreed upon:
+
+</br>
+
+- **Number of simulations**
+
+    We began our testing by setting the iterations to 100 and kept incrementing them slowly until the value of 1750 iterations was reached. At this number, we are pretty confident that our algorithm will always play to win and block any winning attempts by its opponent.
+
+-  **Exploration factor**
+    
+    Since this value must be determined empirically, we began with a value of $\sqrt{2}$ and quickly realized that our selection phase prioritized exploitation over exploration. After incremental tweaks, we settled on the value $4\sqrt{2}$.
