@@ -79,6 +79,22 @@ To ensure that our algorithm would become unbeatable we wrote our client functio
 
     We began our testing by setting the iterations to 100 and kept incrementing them slowly until the value of 1750 iterations was reached. At this number, we are pretty confident that our algorithm will always play to win and block any winning attempts by its opponent.
 
--  **Exploration factor**
+- **Exploration factor**
     
-    Since this value must be determined empirically, we began with a value of $\sqrt{2}$ and quickly realized that our selection phase prioritized exploitation over exploration. After incremental tweaks, we settled on the value $4\sqrt{2}$.
+    Since this value must be determined empirically, we began with a value of $\sqrt{2}$ and quickly realized that our selection phase prioritized exploitation over exploration. After incremental tweaks, we settled on the value $4\sqrt{2}$ as it gave us a good balance of visits for all nodes considered in the selection phase.
+
+</br>
+
+# Main conclusions or remarks
+
+Using the values reached in the previous section, we left one of our computers to battle against itself in what seemed an endless loop of games until we decided to stop it, as a satisfactory value of 80,000+ drawn games was reached. Because of this, we are confident that at these levels, the algorithm is practically unbeatable and that any values below would raise the chance of failure. For example, at 1500 iterations we reached a total of 32,000 games drawn until one of the players finally lost.
+
+Overall, we can conclude that if MCTS is given an appropriate number of iterations and exploration factor, it can be an incredibly good search algorithm with a variety of applications on both single player and multiplayer board games.
+
+</br>
+
+# Main bibliographic references
+
+- MCTS Wikipedia page - https://en.wikipedia.org/wiki/Monte_Carlo_tree_search
+- IA slides 2020-21.
+- Different MCTS implementation - http://codegatherer.com/mcts_tic_tac_toe.php
